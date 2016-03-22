@@ -1,8 +1,17 @@
 #!/usr/bin/env python
+import os
 import socket
 
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SOCK_ADDRESS = ('127.0.0.1', 9000)
+
+
+def check_path_info(path_info):
+    if not path_info:
+        path_info = '/index.html'
+    return os.path.join(BASE_DIR, path_info[1:])
+
 
 def request_parse(text):
     lines = text.splitlines()
@@ -32,7 +41,8 @@ if __name__ == '__main__':
         connection, address = sock.accept()
         request = connection.recv(1024)
 
-        print(request_parse(request))
+        environ = request_parse(request)
+        print(check_path_info(environ['PATH_INFO']))
 
         if not request:
             break
