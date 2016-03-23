@@ -1,30 +1,37 @@
 #!/usr/bin/env python
+import mimetypes
 import os
 import socket
-import os
-import urllib2
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SOCK_ADDRESS = ('127.0.0.1', 9000)
 
 
-def check_path_info(path_info):
-    if not path_info:
-        path_info = '/index.html'
-    return os.path.join(BASE_DIR, path_info[1:])
-
-
 def request_parse(text):
-    lines = text.splitlines()
-    request_method = lines[0].rstrip('\r\n').split()
-    server_name = lines[1].rstrip('\r\n').split()
+    lines = [l.rstrip('\r\n') for l in text.splitlines()]
+    request_method = lines[0].split()
+    server_name = lines[1].split()
 
     return {
         'REQUEST_METHOD': request_method[0],
         'PATH_INFO': request_method[1],
         'SERVER_NAME': server_name[1],
-        'SERVER_PORT': 9000
+        'SERVER_PORT': SOCK_ADDRESS[1],
     }
+
+
+def content_type_header(path_info):
+    """
+    Return the content type header.
+    """
+    if path_info == '/':
+        path_info = '/index.html'
+
+    filename = path_info.split('/')[-1]
+    mimetype = mimetypes.guess_type(filename)
+
+    return 'Content-Type: {0}'.format(mimetype[0])
 
 
 if __name__ == '__main__':
@@ -33,8 +40,8 @@ if __name__ == '__main__':
 
     sock.listen(1)
 
-    header = '''HTTP/1.0 200 OK
-        Content-Type: text/html
+    response_pattern = '''HTTP/1.0 200 OK
+        {content_type}
 
         <h1>Example</h1>'''
 
@@ -43,22 +50,13 @@ if __name__ == '__main__':
         request = connection.recv(1024)
 
         environ = request_parse(request)
-        print(check_path_info(environ['PATH_INFO']))
+        print(environ)
 
         if not request:
             break
-        connection.sendall(header)
-        connection.close()
 
-def request_file(self):
-    try:
-        if os.path.isfile(self):
-            if self.endswith('.html'):
-                return 'text/html'
-            if self.endswith('.jpg'):
-                return 'image/jpeg'
-        else:
-            return False
-    except urllib2.HTTPError, err:
-        if err.code == 404:
-            print 'Arquivo nao encontrado!'
+        response = response_pattern.format(
+            content_type=content_type_header(environ['PATH_INFO'])
+        )
+        connection.sendall(response)
+        connection.close()

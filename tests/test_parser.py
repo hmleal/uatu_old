@@ -1,7 +1,7 @@
 import unittest
 
 from uatu.http_server import request_parse
-from uatu.http_server import request_file
+from uatu.http_server import content_type_header
 
 
 class TestParser(unittest.TestCase):
@@ -19,5 +19,6 @@ class TestParser(unittest.TestCase):
 
         self.assertEquals(expected, found)
 
-    def test_file_exists(self):
-        self.assertEquals(request_file('/var/www/uatu/uatu/index.html'), 'text/html')
+    def test_content_type_header(self):
+        path = '/var/www/uatu/index.html'
+        self.assertEquals('Content-Type: text/html', content_type_header(path))
