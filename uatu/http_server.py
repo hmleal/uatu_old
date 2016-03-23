@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import os
 import socket
-
+import os
+import urllib2
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SOCK_ADDRESS = ('127.0.0.1', 9000)
@@ -48,3 +49,16 @@ if __name__ == '__main__':
             break
         connection.sendall(header)
         connection.close()
+
+def request_file(self):
+    try:
+        if os.path.isfile(self):
+            if self.endswith('.html'):
+                return 'text/html'
+            if self.endswith('.jpg'):
+                return 'image/jpeg'
+        else:
+            return False
+    except urllib2.HTTPError, err:
+        if err.code == 404:
+            print 'Arquivo nao encontrado!'
