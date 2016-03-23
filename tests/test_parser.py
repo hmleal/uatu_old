@@ -1,7 +1,6 @@
 import unittest
 
-from uatu.http_server import request_parse
-from uatu.http_server import content_type_header
+from uatu import http_server
 
 
 class TestParser(unittest.TestCase):
@@ -9,7 +8,7 @@ class TestParser(unittest.TestCase):
         request_headers = '''GET / HTTP/1.1
         Host: localhost:9000'''
 
-        expected = request_parse(request_headers)
+        expected = http_server.request_parse(request_headers)
         found = {
             'PATH_INFO': '/',
             'REQUEST_METHOD': 'GET',
@@ -21,4 +20,11 @@ class TestParser(unittest.TestCase):
 
     def test_content_type_header(self):
         path = '/var/www/uatu/index.html'
-        self.assertEquals('Content-Type: text/html', content_type_header(path))
+        self.assertEquals(
+            'Content-Type: text/html',
+            http_server.content_type_header(path)
+        )
+
+    def test_path_info_is_valid(self):
+        http_server.BASE_DIR = '/'
+        self.assertTrue(http_server.path_info_is_valid('/home'))

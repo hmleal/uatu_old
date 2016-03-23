@@ -12,8 +12,7 @@ def get_404():
     return '''HTTP/1.0 404 Not Found
         Content-Type: text/html
 
-        Not Found
-    '''
+        Not Found'''
 
 
 def request_parse(text):
@@ -42,6 +41,13 @@ def content_type_header(path_info):
     return 'Content-Type: {0}'.format(mimetype[0])
 
 
+def path_info_is_valid(path):
+    full_path = os.path.join(BASE_DIR, path[1:])
+    if os.path.isdir(full_path) or os.path.isfile(full_path):
+        return True
+    return False
+
+
 if __name__ == '__main__':
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(SOCK_ADDRESS)
@@ -63,8 +69,11 @@ if __name__ == '__main__':
         if not request:
             break
 
-        response = response_pattern.format(
-            content_type=content_type_header(environ['PATH_INFO'])
-        )
+        if path_info_is_valid(environ['PATH_INFO']):
+            response = response_pattern.format(
+                content_type=content_type_header(environ['PATH_INFO']))
+        else:
+            response = get_404()
+
         connection.sendall(response)
         connection.close()
