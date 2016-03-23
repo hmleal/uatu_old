@@ -8,6 +8,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SOCK_ADDRESS = ('127.0.0.1', 9000)
 
 
+def get_404():
+    return '''HTTP/1.0 404 Not Found
+        Content-Type: text/html
+
+        Not Found
+    '''
+
+
 def request_parse(text):
     lines = [l.rstrip('\r\n') for l in text.splitlines()]
     request_method = lines[0].split()
