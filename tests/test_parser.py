@@ -18,20 +18,16 @@ class TestParser(unittest.TestCase):
 
         self.assertEquals(expected, found)
 
-    def test_content_type_header(self):
+    def test_content_type_header_for_html(self):
         path = '/var/www/uatu/index.html'
         self.assertEquals(
-            'Content-Type: text/html',
-            http_server.content_type_header(path)
-        )
+            'Content-Type: text/html', http_server.content_type_header(path))
+
+    def test_content_type_header_for_image(self):
+        path = '/var/www/uatu/foto.jpg'
+        self.assertEquals(
+            'Content-Type: image/jpeg', http_server.content_type_header(path))
 
     def test_path_info_is_valid(self):
         http_server.BASE_DIR = '/'
         self.assertTrue(http_server.path_info_is_valid('/home'))
-
-    def test_is_image_valid(self):
-        path = '/var/www/uatu/foto.jpg'
-        self.assertEquals(
-            'Content-Type: image/jpeg',
-            http_server.content_type_header(path)
-        )

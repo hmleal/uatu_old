@@ -42,10 +42,20 @@ def content_type_header(path_info):
 
 
 def path_info_is_valid(path):
-    full_path = os.path.join(BASE_DIR, path[1:])
-    if os.path.isdir(full_path) or os.path.isfile(full_path):
+    """
+    Check if path is valid.
+    """
+    if os.path.isdir(path) or os.path.isfile(path):
         return True
     return False
+
+
+def get_full_path(path):
+    full_path = os.path.join(BASE_DIR, path[1:])
+    if os.path.isdir(full_path):
+        return os.path.join(full_path, 'index.html')
+    else:
+        return full_path
 
 
 if __name__ == '__main__':
@@ -70,13 +80,14 @@ if __name__ == '__main__':
             connection.close()
             break
 
-        if path_info_is_valid(environ['PATH_INFO']):
-            f = open(environ['PATH_INFO'].split('/')[-1])
+        full_path = get_full_path(environ['PATH_INFO'])
+        if path_info_is_valid(full_path):
+            f = open(full_path)
             response = response_pattern.format(
                 content_type=content_type_header(environ['PATH_INFO']),
                 content_body=f.read()
             )
-            print(response);
+            print(response)
             f.close()
         else:
             response = get_404()
