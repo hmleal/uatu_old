@@ -57,21 +57,32 @@ if __name__ == '__main__':
     response_pattern = '''HTTP/1.0 200 OK
         {content_type}
 
-        <h1>Example</h1>'''
+        {content_body}
+        '''
 
     while 1:
         connection, address = sock.accept()
         request = connection.recv(1024)
 
         environ = request_parse(request)
-        print(environ)
+        #print(environ)
 
         if not request:
+            connection.close()
             break
 
         if path_info_is_valid(environ['PATH_INFO']):
+            f = open(environ['PATH_INFO'].split('/')[-1])
             response = response_pattern.format(
-                content_type=content_type_header(environ['PATH_INFO']))
+                content_type=content_type_header(environ['PATH_INFO']),
+                content_body=f.read()
+            )
+            # print(environ);
+            print(response);
+
+            f.close()
+            #if mimetype[0] == 'image/jpeg':
+            #    image = Image.open('foto.jpg').show()
         else:
             response = get_404()
 

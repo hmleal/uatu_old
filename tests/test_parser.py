@@ -28,3 +28,10 @@ class TestParser(unittest.TestCase):
     def test_path_info_is_valid(self):
         http_server.BASE_DIR = '/'
         self.assertTrue(http_server.path_info_is_valid('/home'))
+
+    def test_is_image_valid(self):
+        path = '/var/www/uatu/foto.html'
+        self.assertEquals(
+            'Content-Type: image/jpeg',
+            http_server.content_type_header(path)
+        )
