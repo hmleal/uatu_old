@@ -65,7 +65,6 @@ if __name__ == '__main__':
         request = connection.recv(1024)
 
         environ = request_parse(request)
-        #print(environ)
 
         if not request:
             connection.close()
@@ -77,12 +76,8 @@ if __name__ == '__main__':
                 content_type=content_type_header(environ['PATH_INFO']),
                 content_body=f.read()
             )
-            # print(environ);
             print(response);
-
             f.close()
-            #if mimetype[0] == 'image/jpeg':
-            #    image = Image.open('foto.jpg').show()
         else:
             response = get_404()
 
