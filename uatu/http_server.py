@@ -32,14 +32,17 @@ def content_type_header(path_info):
     """
     Return the content type header.
     """
-    if path_info == '/':
-        path_info = '/index.html'
-
-    filename = path_info.split('/')[-1]
+    filename = get_filename(path_info)
     mimetype = mimetypes.guess_type(filename)
 
     return 'Content-Type: {0}'.format(mimetype[0])
 
+def get_filename(path_info):
+    if path_info == '/':
+        path_info = '/index.html'
+
+    filename = path_info.split('/')[-1]
+    return filename
 
 def path_info_is_valid(path):
     full_path = os.path.join(BASE_DIR, path[1:])
@@ -71,7 +74,7 @@ if __name__ == '__main__':
             break
 
         if path_info_is_valid(environ['PATH_INFO']):
-            f = open(environ['PATH_INFO'].split('/')[-1])
+            f = open(get_filename(environ['PATH_INFO']))
             response = response_pattern.format(
                 content_type=content_type_header(environ['PATH_INFO']),
                 content_body=f.read()
