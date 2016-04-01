@@ -14,6 +14,8 @@ def get_404():
 
         Not Found'''
 
+def get_IOError():
+    return '''File Not Found!'''
 
 def request_parse(text):
     lines = [l.rstrip('\r\n') for l in text.splitlines()]
@@ -32,24 +34,23 @@ def content_type_header(path_info):
     """
     Return the content type header.
     """
-    filename = get_filename(path_info)
+    filename = get_request_file(path_info)
     mimetype = mimetypes.guess_type(filename)
 
     return 'Content-Type: {0}'.format(mimetype[0])
 
-def get_filename(path_info):
-    if path_info == '/':
-        path_info = '/index.html'
+def get_request_file(path_info):
+    full_path = os.path.join(BASE_DIR, path_info[1:])
+    if path_info == '/' or path_info.endswith('/'):
+        path_info = full_path + 'index.html'
 
-    filename = path_info.split('/')[-1]
-    return filename
+    return path_info
 
 def path_info_is_valid(path):
     full_path = os.path.join(BASE_DIR, path[1:])
     if os.path.isdir(full_path) or os.path.isfile(full_path):
         return True
     return False
-
 
 if __name__ == '__main__':
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -74,13 +75,16 @@ if __name__ == '__main__':
             break
 
         if path_info_is_valid(environ['PATH_INFO']):
-            f = open(get_filename(environ['PATH_INFO']))
-            response = response_pattern.format(
-                content_type=content_type_header(environ['PATH_INFO']),
-                content_body=f.read()
-            )
-            print(response);
-            f.close()
+            try:
+                f = open(get_request_file(environ['PATH_INFO']))
+                response = response_pattern.format(
+                    content_type = content_type_header(environ['PATH_INFO']),
+                    content_body = f.read()
+                )
+                print(response);
+                f.close()
+            except IOError as e:
+                response = get_IOError()
         else:
             response = get_404()
 

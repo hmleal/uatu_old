@@ -35,3 +35,10 @@ class TestParser(unittest.TestCase):
             'Content-Type: image/jpeg',
             http_server.content_type_header(path)
         )
+
+    def test_get_request_file(self):
+        filename = '/index.html'
+        self.assertEquals(
+            '/index.html',
+            http_server.get_request_file(filename)
+        )
